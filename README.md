@@ -8,33 +8,33 @@ This project aims to bridge the gap between self-study and classroom education b
 ## Key Features
 
 ### For Students
-* **Real-Time AI Chat:** Text and voice interaction with an AI Tutor (FR3, FR14).
-* **Smart Error Correction:** Automatic detection of grammar mistakes with immediate suggestions (FR17).
-* **Adaptive Learning:** Responses are tailored to the user's proficiency level (FR5).
-* **Study Tools:** * Request and receive learning materials (FR7, FR13).
-    * Calendar-based study reminders (FR21).
-    * Export and view chat history (FR6, FR20).
-* **Assessments:** * Level assessment tests (Reading, Writing, Listening, Grammar) (FR22).
-    * English proficiency exams in private rooms (FR19).
-    * Field-specific mock interviews (e.g., Computer Engineering) (FR25).
+* **Real-Time AI Chat:** Text and voice interaction with an AI Tutor.
+* **Smart Error Correction:** Automatic detection of grammar mistakes with immediate suggestions.
+* **Adaptive Learning:** Responses are tailored to the user's proficiency level.
+* **Study Tools:** * Request and receive learning materials.
+    * Calendar-based study reminders.
+    * Export and view chat history.
+* **Assessments:** * Level assessment tests (Reading, Writing, Listening, Grammar).
+    * English proficiency exams in private rooms.
+    * Field-specific mock interviews (e.g., Computer Engineering).
 
 ### For Teachers
-* **Classroom Management:** Create classrooms and assign students (FR28, FR30).
-* **Progress Tracking:** View student progress and frequently asked topic statistics (FR8, FR16, FR32).
-* **Content Sharing:** Upload and share files, audio, and homework within the class (FR29, FR24).
-* **Group Interaction:** Monitor and participate in group chats with the AI Tutor (FR31).
+* **Classroom Management:** Create classrooms and assign students.
+* **Progress Tracking:** View student progress and frequently asked topic statistics.
+* **Content Sharing:** Upload and share files, audio, and homework within the class.
+* **Group Interaction:** Monitor and participate in group chats with the AI Tutor.
 
 ### System & Admin
-* **User Management:** Secure creation/updating of Student and Teacher accounts (FR1, FR9).
-* **Multilingual Support:** Supports interaction in multiple languages (e.g., English, Turkish) (FR18).
-* **Security:** AES-256 encryption for user data and chat logs (NFR3).
+* **User Management:** Secure creation/updating of Student and Teacher accounts.
+* **Multilingual Support:** Supports interaction in multiple languages (e.g., English, Turkish).
+* **Security:** AES-256 encryption for user data and chat logs.
 
 ## Technical Requirements (Non-Functional)
-* **Performance:** Response time < 15 seconds (NFR1).
-* **Availability:** 99% Uptime (NFR5).
-* **Scalability:** Supports concurrent users (NFR2).
-* **Security:** Data encryption and secure authentication (NFR3).
-* **Usability:** User-friendly interface for all literacy levels (NFR4).
+* **Performance:** Response time < 15 seconds.
+* **Availability:** 99% Uptime.
+* **Scalability:** Supports concurrent users.
+* **Security:** Data encryption and secure authentication.
+* **Usability:** User-friendly interface for all literacy levels.
 
 ## Use Cases
 The system covers high-level goals including:
@@ -61,3 +61,4 @@ The system covers high-level goals including:
     ```bash
     npm start
     ```
+
