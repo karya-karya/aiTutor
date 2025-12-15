@@ -1,6 +1,6 @@
 // ================================================================
-const SUPABASE_URL = 'https://gofukrzeiynkawrisruf.supabase.co'; 
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvZnVrcnplaXlua2F3cmlzcnVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4MTQwNTksImV4cCI6MjA4MTM5MDA1OX0.V9vaqFSdZla5LM8NdbnwUHCrujQDFVVvHOtAQu31ITM'; 
+const SUPABASE_URL = 'https://haowbfhlmhgwjgpgbtyn.supabase.co; 
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhhb3diZmhsbWhnd2pncGdidHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3OTk0MDgsImV4cCI6MjA4MTM3NTQwOH0.oc2LfHXXTRo8YPXrgpbxV6Ts6jvKNOFaaDR15ay9H0A'; 
 
 // ================================================================
 // 2. SUPABASE BAĞLANTISI (Hata Korumalı)
