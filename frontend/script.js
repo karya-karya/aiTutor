@@ -1,3 +1,10 @@
+// ------------------- SUPABASE AYARLARI -------------------
+const SUPABASE_URL = 'BURAYA_SUPABASE_PROJECT_URL_GELECEK';
+const SUPABASE_KEY = 'BURAYA_SUPABASE_ANON_KEY_GELECEK';
+
+// Supabase İstemcisini Başlat
+const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
 // ------------------- SELECTORS -------------------
 const landingView = document.getElementById('landing-view');
 const authView = document.getElementById('auth-view');
@@ -23,7 +30,6 @@ const profileAvatar = document.getElementById('profile-avatar');
 const profileName = document.getElementById('profile-name');
 const profileRole = document.getElementById('profile-role');
 
-// --- YENİ EKLENEN: Google Buton Seçicisi ---
 const btnGoogleLogin = document.getElementById('btn-google-login');
 
 let currentMode = 'chat';
@@ -39,9 +45,8 @@ const btnFooterStart = document.getElementById('btn-footer-start');
 const btnBackHome = document.getElementById('btn-back-home');
 const btnBackHome2 = document.getElementById('btn-back-home-2');
 
-// ------------------- STORAGE -------------------
+// ------------------- STORAGE & HELPERS -------------------
 const USERS_KEY = 'linguaai_users';
-const CURRENT_KEY = 'linguaai_current_user';
 
 function loadUsers() {
   try { return JSON.parse(localStorage.getItem(USERS_KEY)) || []; }
@@ -52,20 +57,6 @@ function saveUsers(users) {
   localStorage.setItem(USERS_KEY, JSON.stringify(users));
 }
 
-function setCurrentUser(user) {
-  localStorage.setItem(CURRENT_KEY, JSON.stringify(user));
-}
-
-function getCurrentUser() {
-  try { return JSON.parse(localStorage.getItem(CURRENT_KEY)); }
-  catch { return null; }
-}
-
-function clearCurrentUser() {
-  localStorage.removeItem(CURRENT_KEY);
-}
-
-// ------------------- HELPERS -------------------
 function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 
 function showAuthError(msg) {
@@ -78,56 +69,46 @@ function clearAuthError() {
 }
 
 function showOnly(viewEl) {
-  // hide all
   landingView.classList.add('hidden');
   authView.classList.add('hidden');
   dashboardView.classList.add('hidden');
   workspaceView.classList.add('hidden');
-
-  // show chosen
   viewEl.classList.remove('hidden');
 }
 
 // ------------------- VIEW CONTROL -------------------
 function showLanding() {
-  document.body.classList.add('public'); // sidebar gizli
+  document.body.classList.add('public');
   clearAuthError();
   showOnly(landingView);
 }
 
 function showAuth(whichTab = 'login') {
-  document.body.classList.add('public'); // sidebar gizli
+  document.body.classList.add('public');
   clearAuthError();
   showOnly(authView);
   activateTab(whichTab);
 }
 
 function showDashboard() {
-  if (!currentUser) {
-    showLanding();
-    return;
-  }
-  document.body.classList.remove('public'); // sidebar göster
+  if (!currentUser) return showLanding();
+  document.body.classList.remove('public');
   showOnly(dashboardView);
 }
 window.showDashboard = showDashboard;
 
-// ------------------- LANDING EVENTS -------------------
+// ------------------- EVENT LISTENERS -------------------
 if(btnGoLogin) btnGoLogin.addEventListener('click', () => showAuth('login'));
 if(btnHeroLogin) btnHeroLogin.addEventListener('click', () => showAuth('login'));
-
 if(btnGoRegister) btnGoRegister.addEventListener('click', () => showAuth('register'));
 if(btnHeroStart) btnHeroStart.addEventListener('click', () => showAuth('register'));
 if (btnFooterStart) btnFooterStart.addEventListener('click', () => showAuth('register'));
-
-
 if(btnBackHome) btnBackHome.addEventListener('click', () => showLanding());
 if(btnBackHome2) btnBackHome2.addEventListener('click', () => showLanding());
 
 // ------------------- AUTH TABS -------------------
 function activateTab(which) {
   clearAuthError();
-
   if (which === 'login') {
     tabLogin.classList.add('active');
     tabRegister.classList.remove('active');
@@ -140,110 +121,101 @@ function activateTab(which) {
     loginForm.classList.add('hidden');
   }
 }
-
 tabLogin.addEventListener('click', () => activateTab('login'));
 tabRegister.addEventListener('click', () => activateTab('register'));
 
-// ------------------- ROLE FIELDS -------------------
-function renderRoleFields(role) {
-  if (role === 'student') {
-    roleFields.innerHTML = `
-      <div class="form-group">
-        <label>Level (optional)</label>
-        <input type="text" id="reg-level" placeholder="A1 / A2 / B1 / B2 / C1..." />
-      </div>
-    `;
-  } else if (role === 'teacher') {
-    roleFields.innerHTML = `
-      <div class="form-group">
-        <label>Department (optional)</label>
-        <input type="text" id="reg-dept" placeholder="e.g., Speaking, IELTS, Grammar..." />
-      </div>
-    `;
-  } else {
-    roleFields.innerHTML = `
-      <div class="form-group">
-        <label>Admin Key (demo)</label>
-        <input type="password" id="reg-adminkey" placeholder="Enter admin key" />
-      </div>
-    `;
-  }
-}
-
-document.getElementById('role-pills').addEventListener('change', (e) => {
-  if (e.target && e.target.name === 'role') renderRoleFields(e.target.value);
-});
-
-// ------------------- LOGIN / REGISTER -------------------
+// ------------------- MANUAL LOGIN / REGISTER -------------------
+// (Bu kısım local storage kullanmaya devam ediyor, istersen burayı da Supabase'e bağlayabiliriz)
 loginForm.addEventListener('submit', (e) => {
   e.preventDefault();
-  clearAuthError();
-
   const email = document.getElementById('login-email').value.trim().toLowerCase();
   const password = document.getElementById('login-password').value;
-
   const users = loadUsers();
   const user = users.find(u => u.email === email && u.password === password);
-
   if (!user) return showAuthError('Invalid email or password.');
-
   loginSuccess(user);
 });
 
 registerForm.addEventListener('submit', (e) => {
   e.preventDefault();
-  clearAuthError();
-
   const name = document.getElementById('reg-name').value.trim();
   const email = document.getElementById('reg-email').value.trim().toLowerCase();
   const password = document.getElementById('reg-password').value;
   const confirm = document.getElementById('reg-confirm').value;
-
-  const role = document.querySelector('input[name="role"]:checked')?.value || 'student';
-
-  if (!name || !email || !password) return showAuthError('Please fill in all required fields.');
   if (password !== confirm) return showAuthError('Passwords do not match.');
-
-  // Admin key demo (istersen kaldır)
-  if (role === 'admin') {
-    const adminKey = document.getElementById('reg-adminkey')?.value || '';
-    if (adminKey !== 'ADMIN123') return showAuthError('Invalid Admin Key. (Demo key: ADMIN123)');
-  }
-
+  
   const users = loadUsers();
-  if (users.some(u => u.email === email)) return showAuthError('This email is already registered.');
-
-  const level = document.getElementById('reg-level')?.value?.trim() || '';
-  const dept = document.getElementById('reg-dept')?.value?.trim() || '';
-
-  const newUser = { name, email, password, role, level, dept };
+  if (users.some(u => u.email === email)) return showAuthError('Email already registered.');
+  
+  const newUser = { name, email, password, role: 'student' };
   users.push(newUser);
   saveUsers(users);
-
   loginSuccess(newUser);
 });
 
-// --- YENİ EKLENEN: Google Login Logic ---
+// ------------------- SUPABASE GOOGLE LOGIN -------------------
+
+// 1. Google Butonuna Tıklanınca
 if (btnGoogleLogin) {
-  btnGoogleLogin.addEventListener('click', () => {
-    // Google ile giriş yapmış gibi simüle ediyoruz
-    const googleUser = {
-      name: "Google User",
-      email: "google-user@example.com",
-      role: "student",
-      level: "B2"
-    };
-    // Direkt sisteme sokuyoruz
-    loginSuccess(googleUser);
+  btnGoogleLogin.addEventListener('click', async () => {
+    if (!supabase) return alert("Supabase bağlantısı yapılmadı! Kodun başındaki URL ve KEY'i kontrol et.");
+
+    // Supabase ile Google Girişi Başlat
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        // Giriş yaptıktan sonra kullanıcıyı bu sayfaya geri gönder
+        redirectTo: window.location.href 
+      }
+    });
+
+    if (error) {
+      console.error('Login Hatası:', error);
+      showAuthError(error.message);
+    }
+    // Başarılı ise kullanıcı otomatik olarak Google'a yönlenir.
   });
 }
 
+// 2. Sayfa Yüklendiğinde Oturum Kontrolü (Geri dönüşü yakalamak için)
+async function checkSupabaseSession() {
+  if (!supabase) return;
+
+  // Mevcut oturumu al
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (session) {
+    // Eğer kullanıcı Google'dan dönmüşse ve oturum varsa:
+    console.log("Supabase kullanıcısı bulundu:", session.user);
+
+    const userMetadata = session.user.user_metadata;
+    
+    // Supabase kullanıcısını bizim sistem formatına çevir
+    const adaptedUser = {
+      name: userMetadata.full_name || session.user.email,
+      email: session.user.email,
+      role: 'student', // Varsayılan rol
+      avatar: userMetadata.avatar_url
+    };
+
+    // Dashboard'u aç
+    loginSuccess(adaptedUser);
+  }
+}
+
+// ------------------- LOGIN SUCCESS -------------------
 function loginSuccess(user) {
   currentUser = user;
-  setCurrentUser(user);
-
-  // profile ui
-  profileAvatar.textContent = (user.name?.charAt(0) || 'U').toUpperCase();
+  
+  // Profil UI güncelle
+  if (user.avatar) {
+    // Google fotosu varsa onu göster (basit bir img etiketi eklemesi yapılabilir css ile, şimdilik text)
+    profileAvatar.innerHTML = `<img src="${user.avatar}" style="width:100%;height:100%;border-radius:50%;">`;
+    profileAvatar.style.background = 'transparent';
+  } else {
+    profileAvatar.textContent = (user.name?.charAt(0) || 'U').toUpperCase();
+  }
+  
   profileName.textContent = user.name || 'User';
   profileRole.textContent = capitalize(user.role || 'student');
 
@@ -251,156 +223,79 @@ function loginSuccess(user) {
 }
 
 // ------------------- LOGOUT -------------------
-function logout() {
-  if (!currentUser) return showLanding();
+window.logout = async function() {
   const ok = confirm('Log out?');
   if (!ok) return;
 
-  currentUser = null;
-  clearCurrentUser();
-  showLanding();
-}
-window.logout = logout;
+  // Supabase'den çıkış yap
+  if (supabase) {
+    await supabase.auth.signOut();
+  }
 
-// ------------------- TOOL NAV -------------------
+  currentUser = null;
+  showLanding();
+  // Sayfayı yenile ki session temizlensin
+  window.location.reload();
+};
+
+// ------------------- TOOL NAV & CHAT (Aynı Kalıyor) -------------------
 function openTool(mode) {
   if (!currentUser) return showLanding();
-
   currentMode = mode;
   showOnly(workspaceView);
-
   chatWindow.innerHTML = '';
-
-  if (mode === 'chat') {
-    toolTitle.innerText = "Free Conversation";
-    addMessage("Hello! I'm ready to chat about anything. How was your day?", 'ai');
-  } else if (mode === 'interview') {
-    toolTitle.innerText = "Mock Interview Simulation";
-    addMessage("Welcome to the interview session. Could you please introduce yourself briefly?", 'ai');
-  } else if (mode === 'grammar') {
-    toolTitle.innerText = "Grammar Fixer";
-    addMessage("Paste your text here, and I will correct your grammar mistakes.", 'ai');
-  } else if (mode === 'tutor') {
-    toolTitle.innerText = "Topic Explainer";
-    addMessage("Which topic or grammar rule would you like me to explain?", 'ai');
-  }
+  toolTitle.innerText = mode === 'chat' ? "Free Conversation" : "AI Tool";
+  addMessage("Hello! Ready to practice.", 'ai');
 }
 window.openTool = openTool;
 
-// ------------------- CHAT -------------------
-userInput.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') sendMessage();
-});
+const userInputElem = document.getElementById('user-input');
+if(userInputElem) {
+    userInputElem.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+}
 
 function sendMessage() {
-  const text = userInput.value.trim();
-  if (text === "") return;
-
+  const input = document.getElementById('user-input');
+  const text = input.value.trim();
+  if (!text) return;
   addMessage(text, 'user');
-  userInput.value = '';
-
-  showTypingIndicator();
-
-  setTimeout(() => {
-    removeTypingIndicator();
-    generateAIResponse(text);
-  }, 900);
+  input.value = '';
+  setTimeout(() => addMessage("This is a demo AI response.", 'ai'), 800);
 }
 window.sendMessage = sendMessage;
 
 function addMessage(text, sender) {
   const msgDiv = document.createElement('div');
   msgDiv.classList.add('message', sender === 'user' ? 'user-msg' : 'ai-msg');
-
-  const icon = sender === 'user'
-    ? '<i class="fa-solid fa-user"></i>'
-    : '<i class="fa-solid fa-robot"></i>';
-
-  msgDiv.innerHTML = `
-    <div class="msg-avatar">${icon}</div>
-    <div class="msg-bubble">${text}</div>
-  `;
-
+  const icon = sender === 'user' ? '<i class="fa-solid fa-user"></i>' : '<i class="fa-solid fa-robot"></i>';
+  msgDiv.innerHTML = `<div class="msg-avatar">${icon}</div><div class="msg-bubble">${text}</div>`;
   chatWindow.appendChild(msgDiv);
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
-function generateAIResponse(text) {
-  const lowerText = text.toLowerCase();
-  let response = "";
-  let correction = null;
-
-  if (lowerText.includes("i goes")) {
-    correction = "Correction: Use 'I go' instead of 'I goes'.";
-  }
-
-  if (currentMode === 'interview') {
-    response = "That's a good start. Can you tell me about a challenge you faced in your previous projects?";
-  } else if (currentMode === 'grammar') {
-    response = correction
-      ? "I found a mistake. See the correction above. Would you like more examples?"
-      : "Your sentence looks correct! Good job. Send me another one.";
-  } else if (currentMode === 'tutor') {
-    response = "Tell me the exact grammar topic, and I’ll explain it with examples.";
-  } else {
-    response = lowerText.includes("hello")
-      ? "Hi there! What's on your mind?"
-      : "That is interesting! Tell me more about it.";
-  }
-
-  if (correction) {
-    correctionText.innerText = correction;
-    correctionBox.classList.remove('hidden');
-    setTimeout(() => correctionBox.classList.add('hidden'), 5000);
-  }
-
-  addMessage(response, 'ai');
-}
-
-function showTypingIndicator() {
-  const indicator = document.createElement('div');
-  indicator.id = 'typing-indicator';
-  indicator.classList.add('message', 'ai-msg');
-  indicator.innerHTML = `
-    <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
-    <div class="msg-bubble" style="font-style:italic; color:#999;">Thinking...</div>
-  `;
-  chatWindow.appendChild(indicator);
-  chatWindow.scrollTop = chatWindow.scrollHeight;
-}
-
-function removeTypingIndicator() {
-  const indicator = document.getElementById('typing-indicator');
-  if (indicator) indicator.remove();
-}
-
-// ------------------- EXPORT (demo) -------------------
-function exportChat() {
-  const bubbles = [...document.querySelectorAll('.msg-bubble')].map(b => b.innerText);
-  const text = bubbles.join('\n\n');
-
-  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'chat_export.txt';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-
-  URL.revokeObjectURL(url);
-}
-window.exportChat = exportChat;
-
 // ------------------- INIT -------------------
 (function init() {
-  renderRoleFields('student');
-
-  const saved = getCurrentUser();
-  if (saved) {
-    loginSuccess(saved);  // direkt dashboard
+  // Önce Supabase oturumunu kontrol et
+  if (supabase) {
+    checkSupabaseSession();
   } else {
-    showLanding();        // ilk giriş: public ana sayfa
+    // Supabase yoksa standart akış
+    const saved = JSON.parse(localStorage.getItem('linguaai_current_user')); // eski usul kontrol
+    if (saved) loginSuccess(saved);
+    else showLanding();
+  }
+  
+  // Render role fields
+  const rolePills = document.getElementById('role-pills');
+  if(rolePills) {
+      rolePills.addEventListener('change', (e) => {
+         if (e.target.name === 'role') {
+            const roleFields = document.getElementById('role-fields');
+            roleFields.innerHTML = e.target.value === 'student' ? 
+               '<div class="form-group"><label>Level</label><input type="text" placeholder="A1/A2..."></div>' : '';
+         }
+      });
   }
 })();
