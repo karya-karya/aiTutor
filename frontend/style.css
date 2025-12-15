@@ -551,3 +551,55 @@ body.public .sidebar { display: none; }
 @media (max-width: 920px) {
   .landing-hero { grid-template-columns: 1fr; }
 }
+
+/* --- GOOGLE LOGIN EKLEMELERİ --- */
+.google-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 900; /* Mevcut font kalınlığına uyum */
+  cursor: pointer;
+  transition: 0.2s;
+  margin-bottom: 20px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.google-btn:hover {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.google-btn img {
+  width: 20px;
+  height: 20px;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.auth-divider::before, .auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.auth-divider span {
+  padding: 0 12px;
+}
+
