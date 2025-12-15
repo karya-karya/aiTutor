@@ -1,301 +1,332 @@
-// ------------------- SUPABASE AYARLARI -------------------
-const SUPABASE_URL = 'BURAYA_SUPABASE_PROJECT_URL_GELECEK';
-const SUPABASE_KEY = 'BURAYA_SUPABASE_ANON_KEY_GELECEK';
+// ================================================================
+const SUPABASE_URL = 'https://gofukrzeiynkawrisruf.supabase.co'; 
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvZnVrcnplaXlua2F3cmlzcnVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4MTQwNTksImV4cCI6MjA4MTM5MDA1OX0.V9vaqFSdZla5LM8NdbnwUHCrujQDFVVvHOtAQu31ITM'; 
 
-// Supabase İstemcisini Başlat
-const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+// ================================================================
+// 2. SUPABASE BAĞLANTISI (Hata Korumalı)
+// ================================================================
+let supabase = null;
 
-// ------------------- SELECTORS -------------------
-const landingView = document.getElementById('landing-view');
-const authView = document.getElementById('auth-view');
-const dashboardView = document.getElementById('dashboard-view');
-const workspaceView = document.getElementById('workspace-view');
-
-const toolTitle = document.getElementById('tool-title');
-const chatWindow = document.getElementById('chat-window');
-const userInput = document.getElementById('user-input');
-const correctionBox = document.getElementById('correction-box');
-const correctionText = document.getElementById('correction-text');
-
-const tabLogin = document.getElementById('tab-login');
-const tabRegister = document.getElementById('tab-register');
-
-const loginForm = document.getElementById('login-form');
-const registerForm = document.getElementById('register-form');
-
-const authError = document.getElementById('auth-error');
-const roleFields = document.getElementById('role-fields');
-
-const profileAvatar = document.getElementById('profile-avatar');
-const profileName = document.getElementById('profile-name');
-const profileRole = document.getElementById('profile-role');
-
-const btnGoogleLogin = document.getElementById('btn-google-login');
-
-let currentMode = 'chat';
-let currentUser = null;
-
-// Landing buttons
-const btnGoLogin = document.getElementById('btn-go-login');
-const btnGoRegister = document.getElementById('btn-go-register');
-const btnHeroStart = document.getElementById('btn-hero-start');
-const btnHeroLogin = document.getElementById('btn-hero-login');
-const btnFooterStart = document.getElementById('btn-footer-start');
-
-const btnBackHome = document.getElementById('btn-back-home');
-const btnBackHome2 = document.getElementById('btn-back-home-2');
-
-// ------------------- STORAGE & HELPERS -------------------
-const USERS_KEY = 'linguaai_users';
-
-function loadUsers() {
-  try { return JSON.parse(localStorage.getItem(USERS_KEY)) || []; }
-  catch { return []; }
+try {
+  if (SUPABASE_URL && SUPABASE_KEY && window.supabase) {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log("Supabase bağlantısı hazır.");
+  } else {
+    console.warn("Supabase anahtarları eksik! Site Demo modunda çalışacak.");
+  }
+} catch (err) {
+  console.error("Supabase başlatılamadı:", err);
 }
 
-function saveUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
+// ================================================================
+// 3. SEÇİCİLER (HTML Elemanlarını Seçiyoruz)
+// ================================================================
+const views = {
+  landing: document.getElementById('landing-view'),
+  auth: document.getElementById('auth-view'),
+  dashboard: document.getElementById('dashboard-view'),
+  workspace: document.getElementById('workspace-view')
+};
 
-function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+const components = {
+  loginForm: document.getElementById('login-form'),
+  registerForm: document.getElementById('register-form'),
+  tabLogin: document.getElementById('tab-login'),
+  tabRegister: document.getElementById('tab-register'),
+  authError: document.getElementById('auth-error'),
+  roleFields: document.getElementById('role-fields'),
+  profileAvatar: document.getElementById('profile-avatar'),
+  profileName: document.getElementById('profile-name'),
+  profileRole: document.getElementById('profile-role'),
+  chatWindow: document.getElementById('chat-window'),
+  userInput: document.getElementById('user-input'),
+  toolTitle: document.getElementById('tool-title'),
+  correctionBox: document.getElementById('correction-box'),
+  correctionText: document.getElementById('correction-text'),
+  btnGoogle: document.getElementById('btn-google-login')
+};
+
+// ================================================================
+// 4. YARDIMCI FONKSİYONLAR
+// ================================================================
+function showView(viewName) {
+  // Tüm ekranları gizle
+  Object.values(views).forEach(el => el && el.classList.add('hidden'));
+  
+  // İstenen ekranı göster
+  if (views[viewName]) {
+    views[viewName].classList.remove('hidden');
+  }
+
+  // Sidebar kontrolü
+  if (viewName === 'dashboard' || viewName === 'workspace') {
+    document.body.classList.remove('public');
+  } else {
+    document.body.classList.add('public');
+  }
+}
 
 function showAuthError(msg) {
-  authError.textContent = msg;
-  authError.classList.remove('hidden');
-}
-function clearAuthError() {
-  authError.textContent = '';
-  authError.classList.add('hidden');
-}
-
-function showOnly(viewEl) {
-  landingView.classList.add('hidden');
-  authView.classList.add('hidden');
-  dashboardView.classList.add('hidden');
-  workspaceView.classList.add('hidden');
-  viewEl.classList.remove('hidden');
-}
-
-// ------------------- VIEW CONTROL -------------------
-function showLanding() {
-  document.body.classList.add('public');
-  clearAuthError();
-  showOnly(landingView);
-}
-
-function showAuth(whichTab = 'login') {
-  document.body.classList.add('public');
-  clearAuthError();
-  showOnly(authView);
-  activateTab(whichTab);
-}
-
-function showDashboard() {
-  if (!currentUser) return showLanding();
-  document.body.classList.remove('public');
-  showOnly(dashboardView);
-}
-window.showDashboard = showDashboard;
-
-// ------------------- EVENT LISTENERS -------------------
-if(btnGoLogin) btnGoLogin.addEventListener('click', () => showAuth('login'));
-if(btnHeroLogin) btnHeroLogin.addEventListener('click', () => showAuth('login'));
-if(btnGoRegister) btnGoRegister.addEventListener('click', () => showAuth('register'));
-if(btnHeroStart) btnHeroStart.addEventListener('click', () => showAuth('register'));
-if (btnFooterStart) btnFooterStart.addEventListener('click', () => showAuth('register'));
-if(btnBackHome) btnBackHome.addEventListener('click', () => showLanding());
-if(btnBackHome2) btnBackHome2.addEventListener('click', () => showLanding());
-
-// ------------------- AUTH TABS -------------------
-function activateTab(which) {
-  clearAuthError();
-  if (which === 'login') {
-    tabLogin.classList.add('active');
-    tabRegister.classList.remove('active');
-    loginForm.classList.remove('hidden');
-    registerForm.classList.add('hidden');
-  } else {
-    tabRegister.classList.add('active');
-    tabLogin.classList.remove('active');
-    registerForm.classList.remove('hidden');
-    loginForm.classList.add('hidden');
+  if (components.authError) {
+    components.authError.textContent = msg;
+    components.authError.classList.remove('hidden');
   }
 }
-tabLogin.addEventListener('click', () => activateTab('login'));
-tabRegister.addEventListener('click', () => activateTab('register'));
 
-// ------------------- MANUAL LOGIN / REGISTER -------------------
-// (Bu kısım local storage kullanmaya devam ediyor, istersen burayı da Supabase'e bağlayabiliriz)
-loginForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const email = document.getElementById('login-email').value.trim().toLowerCase();
-  const password = document.getElementById('login-password').value;
-  const users = loadUsers();
-  const user = users.find(u => u.email === email && u.password === password);
-  if (!user) return showAuthError('Invalid email or password.');
-  loginSuccess(user);
-});
+function clearAuthError() {
+  if (components.authError) {
+    components.authError.textContent = '';
+    components.authError.classList.add('hidden');
+  }
+}
 
-registerForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const name = document.getElementById('reg-name').value.trim();
-  const email = document.getElementById('reg-email').value.trim().toLowerCase();
-  const password = document.getElementById('reg-password').value;
-  const confirm = document.getElementById('reg-confirm').value;
-  if (password !== confirm) return showAuthError('Passwords do not match.');
+// Kullanıcıyı LocalStorage'dan çekme (Demo modu için)
+function getLocalUsers() {
+  return JSON.parse(localStorage.getItem('linguaai_users')) || [];
+}
+
+function saveLocalUser(user) {
+  const users = getLocalUsers();
+  users.push(user);
+  localStorage.setItem('linguaai_users', JSON.stringify(users));
+}
+
+let currentUser = null; // Aktif kullanıcı
+
+// ================================================================
+// 5. GLOBAL FONKSİYONLAR (HTML'deki onclick="..." için gerekli)
+// ================================================================
+
+// 5.1. Dashboard'a Geçiş
+window.showDashboard = function() {
+  if (!currentUser) {
+    window.showLanding();
+    return;
+  }
+  showView('dashboard');
+};
+
+// 5.2. Landing Sayfasına Dönüş
+window.showLanding = function() {
+  showView('landing');
+};
+
+// 5.3. Auth Sayfasını Aç (Login/Register Tabları)
+window.showAuth = function(tab) {
+  clearAuthError();
+  showView('auth');
   
-  const users = loadUsers();
-  if (users.some(u => u.email === email)) return showAuthError('Email already registered.');
+  if (tab === 'login') {
+    components.tabLogin.classList.add('active');
+    components.tabRegister.classList.remove('active');
+    components.loginForm.classList.remove('hidden');
+    components.registerForm.classList.add('hidden');
+  } else {
+    components.tabRegister.classList.add('active');
+    components.tabLogin.classList.remove('active');
+    components.registerForm.classList.remove('hidden');
+    components.loginForm.classList.add('hidden');
+  }
+};
+
+// 5.4. Çıkış Yap
+window.logout = async function() {
+  if (confirm('Çıkış yapmak istiyor musunuz?')) {
+    if (supabase) await supabase.auth.signOut();
+    currentUser = null;
+    window.location.reload(); // Sayfayı yenile
+  }
+};
+
+// 5.5. Araçları Aç (Chat, Grammar vb.)
+window.openTool = function(mode) {
+  if (!currentUser) return window.showLanding();
   
-  const newUser = { name, email, password, role: 'student' };
-  users.push(newUser);
-  saveUsers(users);
-  loginSuccess(newUser);
-});
+  showView('workspace');
+  components.chatWindow.innerHTML = ''; // Sohbeti temizle
+  
+  let title = "Tool";
+  let welcomeMsg = "Hello!";
+  
+  if (mode === 'chat') { title = "Free Conversation"; welcomeMsg = "Let's chat about anything!"; }
+  else if (mode === 'interview') { title = "Mock Interview"; welcomeMsg = "Tell me about yourself."; }
+  else if (mode === 'grammar') { title = "Grammar Fixer"; welcomeMsg = "Paste your text here."; }
+  else if (mode === 'tutor') { title = "Topic Explainer"; welcomeMsg = "Ask me a grammar rule."; }
+  
+  components.toolTitle.innerText = title;
+  addMessage(welcomeMsg, 'ai');
+};
 
-// ------------------- SUPABASE GOOGLE LOGIN -------------------
+// 5.6. Mesaj Gönderme
+window.sendMessage = function() {
+  const text = components.userInput.value.trim();
+  if (!text) return;
+  
+  addMessage(text, 'user');
+  components.userInput.value = '';
+  
+  // Yapay Zeka Cevap Simülasyonu
+  setTimeout(() => {
+    addMessage("This is a demo AI response (Backend not connected).", 'ai');
+  }, 1000);
+};
 
-// 1. Google Butonuna Tıklanınca
-if (btnGoogleLogin) {
-  btnGoogleLogin.addEventListener('click', async () => {
-    if (!supabase) return alert("Supabase bağlantısı yapılmadı! Kodun başındaki URL ve KEY'i kontrol et.");
+// 5.7. Export
+window.exportChat = function() {
+  alert("Export feature is coming soon!");
+};
 
-    // Supabase ile Google Girişi Başlat
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        // Giriş yaptıktan sonra kullanıcıyı bu sayfaya geri gönder
-        redirectTo: window.location.href 
+// Yardımcı: Mesaj Ekleme
+function addMessage(text, sender) {
+  const div = document.createElement('div');
+  div.className = `message ${sender === 'user' ? 'user-msg' : 'ai-msg'}`;
+  
+  const icon = sender === 'user' ? '<i class="fa-solid fa-user"></i>' : '<i class="fa-solid fa-robot"></i>';
+  
+  div.innerHTML = `
+    <div class="msg-avatar">${icon}</div>
+    <div class="msg-bubble">${text}</div>
+  `;
+  
+  components.chatWindow.appendChild(div);
+  components.chatWindow.scrollTop = components.chatWindow.scrollHeight;
+}
+
+// ================================================================
+// 6. EVENT LISTENERS (Buton Tıklamaları)
+// ================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  
+  // Landing Butonları
+  document.getElementById('btn-go-login')?.addEventListener('click', () => window.showAuth('login'));
+  document.getElementById('btn-go-register')?.addEventListener('click', () => window.showAuth('register'));
+  document.getElementById('btn-hero-start')?.addEventListener('click', () => window.showAuth('register'));
+  document.getElementById('btn-hero-login')?.addEventListener('click', () => window.showAuth('login'));
+  
+  document.getElementById('btn-back-home')?.addEventListener('click', () => window.showLanding());
+  document.getElementById('btn-back-home-2')?.addEventListener('click', () => window.showLanding());
+
+  // Tab Geçişleri
+  components.tabLogin?.addEventListener('click', () => window.showAuth('login'));
+  components.tabRegister?.addEventListener('click', () => window.showAuth('register'));
+
+  // Rol Değişimi (Öğrenci/Öğretmen inputları)
+  document.getElementById('role-pills')?.addEventListener('change', (e) => {
+    if (e.target.name === 'role' && components.roleFields) {
+       components.roleFields.innerHTML = e.target.value === 'student' 
+        ? '<div class="form-group"><label>Level</label><input type="text" placeholder="A1, B2..."></div>' 
+        : '';
+    }
+  });
+
+  // ---------------------------------------------
+  // GOOGLE LOGIN (SUPABASE)
+  // ---------------------------------------------
+  if (components.btnGoogle) {
+    components.btnGoogle.addEventListener('click', async () => {
+      // 1. Supabase varsa gerçek giriş yap
+      if (supabase) {
+        try {
+          const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: { redirectTo: window.location.href }
+          });
+          if (error) throw error;
+        } catch (err) {
+          alert("Google girişi hatası: " + err.message);
+        }
+      } 
+      // 2. Supabase yoksa Demo girişi yap
+      else {
+        alert("Supabase anahtarları girilmediği için DEMO girişi yapılıyor.");
+        loginSuccess({
+          email: "demo@google.com",
+          name: "Demo Google User",
+          role: "student"
+        });
       }
     });
-
-    if (error) {
-      console.error('Login Hatası:', error);
-      showAuthError(error.message);
-    }
-    // Başarılı ise kullanıcı otomatik olarak Google'a yönlenir.
-  });
-}
-
-// 2. Sayfa Yüklendiğinde Oturum Kontrolü (Geri dönüşü yakalamak için)
-async function checkSupabaseSession() {
-  if (!supabase) return;
-
-  // Mevcut oturumu al
-  const { data: { session } } = await supabase.auth.getSession();
-
-  if (session) {
-    // Eğer kullanıcı Google'dan dönmüşse ve oturum varsa:
-    console.log("Supabase kullanıcısı bulundu:", session.user);
-
-    const userMetadata = session.user.user_metadata;
-    
-    // Supabase kullanıcısını bizim sistem formatına çevir
-    const adaptedUser = {
-      name: userMetadata.full_name || session.user.email,
-      email: session.user.email,
-      role: 'student', // Varsayılan rol
-      avatar: userMetadata.avatar_url
-    };
-
-    // Dashboard'u aç
-    loginSuccess(adaptedUser);
   }
+
+  // ---------------------------------------------
+  // NORMAL LOGIN (Form Submit)
+  // ---------------------------------------------
+  components.loginForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const pass = document.getElementById('login-password').value;
+    
+    // Local kontrol
+    const users = getLocalUsers();
+    const user = users.find(u => u.email === email && u.password === pass);
+    
+    if (user) loginSuccess(user);
+    else showAuthError("Invalid email or password (Try Registering first in Demo mode).");
+  });
+
+  // ---------------------------------------------
+  // REGISTER (Form Submit)
+  // ---------------------------------------------
+  components.registerForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('reg-name').value;
+    const email = document.getElementById('reg-email').value;
+    const pass = document.getElementById('reg-password').value;
+    const confirm = document.getElementById('reg-confirm').value;
+
+    if (pass !== confirm) return showAuthError("Passwords do not match");
+
+    const newUser = { name, email, password: pass, role: 'student' };
+    saveLocalUser(newUser);
+    loginSuccess(newUser);
+  });
+
+  // Enter tuşu ile mesaj gönderme
+  components.userInput?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') window.sendMessage();
+  });
+
+  // Başlangıç Kontrolü (Sayfa yenilenince)
+  initSession();
+});
+
+// ================================================================
+// 7. OTURUM YÖNETİMİ
+// ================================================================
+async function initSession() {
+  // A. Önce Supabase kontrolü
+  if (supabase) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const user = {
+        name: session.user.user_metadata.full_name || session.user.email,
+        email: session.user.email,
+        role: 'student',
+        avatar: session.user.user_metadata.avatar_url
+      };
+      loginSuccess(user);
+      return;
+    }
+  }
+
+  // B. Yoksa Landing sayfasını göster
+  window.showLanding();
 }
 
-// ------------------- LOGIN SUCCESS -------------------
 function loginSuccess(user) {
   currentUser = user;
   
-  // Profil UI güncelle
-  if (user.avatar) {
-    // Google fotosu varsa onu göster (basit bir img etiketi eklemesi yapılabilir css ile, şimdilik text)
-    profileAvatar.innerHTML = `<img src="${user.avatar}" style="width:100%;height:100%;border-radius:50%;">`;
-    profileAvatar.style.background = 'transparent';
-  } else {
-    profileAvatar.textContent = (user.name?.charAt(0) || 'U').toUpperCase();
-  }
-  
-  profileName.textContent = user.name || 'User';
-  profileRole.textContent = capitalize(user.role || 'student');
-
-  showDashboard();
-}
-
-// ------------------- LOGOUT -------------------
-window.logout = async function() {
-  const ok = confirm('Log out?');
-  if (!ok) return;
-
-  // Supabase'den çıkış yap
-  if (supabase) {
-    await supabase.auth.signOut();
+  // Profil Güncelle
+  if (components.profileName) components.profileName.textContent = user.name;
+  if (components.profileRole) components.profileRole.textContent = user.role.toUpperCase();
+  if (components.profileAvatar) {
+    if (user.avatar) {
+      components.profileAvatar.innerHTML = `<img src="${user.avatar}" style="width:100%;height:100%;border-radius:50%">`;
+      components.profileAvatar.style.background = 'transparent';
+    } else {
+      components.profileAvatar.textContent = user.name.charAt(0).toUpperCase();
+    }
   }
 
-  currentUser = null;
-  showLanding();
-  // Sayfayı yenile ki session temizlensin
-  window.location.reload();
-};
-
-// ------------------- TOOL NAV & CHAT (Aynı Kalıyor) -------------------
-function openTool(mode) {
-  if (!currentUser) return showLanding();
-  currentMode = mode;
-  showOnly(workspaceView);
-  chatWindow.innerHTML = '';
-  toolTitle.innerText = mode === 'chat' ? "Free Conversation" : "AI Tool";
-  addMessage("Hello! Ready to practice.", 'ai');
+  window.showDashboard();
 }
-window.openTool = openTool;
-
-const userInputElem = document.getElementById('user-input');
-if(userInputElem) {
-    userInputElem.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
-    });
-}
-
-function sendMessage() {
-  const input = document.getElementById('user-input');
-  const text = input.value.trim();
-  if (!text) return;
-  addMessage(text, 'user');
-  input.value = '';
-  setTimeout(() => addMessage("This is a demo AI response.", 'ai'), 800);
-}
-window.sendMessage = sendMessage;
-
-function addMessage(text, sender) {
-  const msgDiv = document.createElement('div');
-  msgDiv.classList.add('message', sender === 'user' ? 'user-msg' : 'ai-msg');
-  const icon = sender === 'user' ? '<i class="fa-solid fa-user"></i>' : '<i class="fa-solid fa-robot"></i>';
-  msgDiv.innerHTML = `<div class="msg-avatar">${icon}</div><div class="msg-bubble">${text}</div>`;
-  chatWindow.appendChild(msgDiv);
-  chatWindow.scrollTop = chatWindow.scrollHeight;
-}
-
-// ------------------- INIT -------------------
-(function init() {
-  // Önce Supabase oturumunu kontrol et
-  if (supabase) {
-    checkSupabaseSession();
-  } else {
-    // Supabase yoksa standart akış
-    const saved = JSON.parse(localStorage.getItem('linguaai_current_user')); // eski usul kontrol
-    if (saved) loginSuccess(saved);
-    else showLanding();
-  }
-  
-  // Render role fields
-  const rolePills = document.getElementById('role-pills');
-  if(rolePills) {
-      rolePills.addEventListener('change', (e) => {
-         if (e.target.name === 'role') {
-            const roleFields = document.getElementById('role-fields');
-            roleFields.innerHTML = e.target.value === 'student' ? 
-               '<div class="form-group"><label>Level</label><input type="text" placeholder="A1/A2..."></div>' : '';
-         }
-      });
-  }
-})();
