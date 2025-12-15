@@ -23,6 +23,9 @@ const profileAvatar = document.getElementById('profile-avatar');
 const profileName = document.getElementById('profile-name');
 const profileRole = document.getElementById('profile-role');
 
+// --- YENİ EKLENEN: Google Buton Seçicisi ---
+const btnGoogleLogin = document.getElementById('btn-google-login');
+
 let currentMode = 'chat';
 let currentUser = null;
 
@@ -110,16 +113,16 @@ function showDashboard() {
 window.showDashboard = showDashboard;
 
 // ------------------- LANDING EVENTS -------------------
-btnGoLogin.addEventListener('click', () => showAuth('login'));
-btnHeroLogin.addEventListener('click', () => showAuth('login'));
+if(btnGoLogin) btnGoLogin.addEventListener('click', () => showAuth('login'));
+if(btnHeroLogin) btnHeroLogin.addEventListener('click', () => showAuth('login'));
 
-btnGoRegister.addEventListener('click', () => showAuth('register'));
-btnHeroStart.addEventListener('click', () => showAuth('register'));
+if(btnGoRegister) btnGoRegister.addEventListener('click', () => showAuth('register'));
+if(btnHeroStart) btnHeroStart.addEventListener('click', () => showAuth('register'));
 if (btnFooterStart) btnFooterStart.addEventListener('click', () => showAuth('register'));
 
 
-btnBackHome.addEventListener('click', () => showLanding());
-btnBackHome2.addEventListener('click', () => showLanding());
+if(btnBackHome) btnBackHome.addEventListener('click', () => showLanding());
+if(btnBackHome2) btnBackHome2.addEventListener('click', () => showLanding());
 
 // ------------------- AUTH TABS -------------------
 function activateTab(which) {
@@ -219,6 +222,21 @@ registerForm.addEventListener('submit', (e) => {
 
   loginSuccess(newUser);
 });
+
+// --- YENİ EKLENEN: Google Login Logic ---
+if (btnGoogleLogin) {
+  btnGoogleLogin.addEventListener('click', () => {
+    // Google ile giriş yapmış gibi simüle ediyoruz
+    const googleUser = {
+      name: "Google User",
+      email: "google-user@example.com",
+      role: "student",
+      level: "B2"
+    };
+    // Direkt sisteme sokuyoruz
+    loginSuccess(googleUser);
+  });
+}
 
 function loginSuccess(user) {
   currentUser = user;
