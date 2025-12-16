@@ -1,0 +1,13 @@
+
+create table public.profiles (
+  id uuid references auth.users not null primary key,
+  email text,
+  full_name text,
+  role text default 'student', -- student, teacher, admin
+  level text, 
+  department text, 
+  xp integer default 0, -- Oyunlaştırma için puan
+  badges text, -- Rozetler
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
