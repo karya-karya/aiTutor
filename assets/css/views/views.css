@@ -1,152 +1,6 @@
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: "Outfit", sans-serif; }
+/* === VIEWS.CSS (Sayfa Özel Tasarımları) === */
 
-html, body { height: 100%; }
-body { background-color: #f8f9fc; color: #1e293b; overflow: hidden;}
-
-.hidden { display: none !important; }
-
-input, button, select, textarea { font-family: inherit; }
-
-.app-container { display: flex; height: 100%; }
-
-/* PUBLIC MODE: sidebar gizli */
-body.public .sidebar { display: none; }
-
-/* SIDEBAR */
-.sidebar {
-  width: 260px;
-  background: white;
-  border-right: 1px solid #e2e8f0;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-}
-
-.brand {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #4f46e5;
-  margin-bottom: 40px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.menu { display: flex; flex-direction: column; gap: 5px; flex: 1; }
-
-.menu a {
-  text-decoration: none;
-  color: #64748b;
-  padding: 12px 15px;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  transition: 0.2s;
-}
-
-.menu a:hover, .menu a.active { background-color: #eef2ff; color: #4f46e5; font-weight: 600; }
-
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-top: 20px;
-  border-top: 1px solid #e2e8f0;
-  cursor: pointer;
-}
-
-.user-profile:hover { opacity: 0.95; }
-
-.avatar {
-  width: 40px; height: 40px;
-  background: #4f46e5;
-  color: white;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 900;
-}
-
-.user-info { display: flex; flex-direction: column; }
-.user-info .name { font-size: 0.95rem; font-weight: 800; }
-.user-info .role { font-size: 0.75rem; color: #94a3b8; font-weight: 800; }
-
-/* MAIN */
-.main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-
-.view-section { padding: 40px; height: 100%; overflow-y: auto; }
-
-/* COMMON BUTTONS */
-.primary-btn {
-  border: none;
-  border-radius: 12px;
-  padding: 12px 14px;
-  background: #4f46e5;
-  color: white;
-  font-weight: 900;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  transition: 0.2s;
-}
-
-.primary-btn:hover { background: #4338ca; }
-.primary-btn.small { padding: 10px 12px; border-radius: 12px; font-size: 14px; }
-
-.ghost-btn {
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
-  color: #0f172a;
-  padding: 10px 12px;
-  border-radius: 12px;
-  font-weight: 900;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.ghost-btn:hover { background: #f1f5f9; }
-
-.outline-btn {
-  border: 1px solid #cbd5e1;
-  background: transparent;
-  color: #0f172a;
-  padding: 12px 14px;
-  border-radius: 12px;
-  font-weight: 900;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.outline-btn:hover { background: #ffffff; }
-
-.link-btn {
-  border: none;
-  background: transparent;
-  color: #4f46e5;
-  font-weight: 900;
-  cursor: pointer;
-  padding: 8px 0;
-}
-
-.link-btn:hover { text-decoration: underline; }
-
-.muted { color: #64748b; }
-
-/* ICON BOX (cards) */
-.icon-box { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
-.blue { background: #eff6ff; color: #3b82f6; }
-.purple { background: #f5f3ff; color: #8b5cf6; }
-.orange { background: #fff7ed; color: #f97316; }
-.green { background: #f0fdf4; color: #22c55e; }
-
-/* LANDING */
+/* --- 1. LANDING VIEW --- */
 .landing-view { padding: 26px 40px; }
 .landing-topbar {
   display: flex;
@@ -296,7 +150,12 @@ body.public .sidebar { display: none; }
   justify-content: space-between;
 }
 
-/* AUTH */
+/* Landing Responsive */
+@media (max-width: 920px) {
+  .landing-hero { grid-template-columns: 1fr; }
+}
+
+/* --- 2. AUTH VIEW (Giriş Yap) --- */
 .auth-view { 
   display: flex; 
   align-items: flex-start;
@@ -415,8 +274,58 @@ body.public .sidebar { display: none; }
   border-color: #c7d2fe;
 }
 
+/* Auth: Google ve Divider */
+.google-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 900; 
+  cursor: pointer;
+  transition: 0.2s;
+  margin-bottom: 20px;
+  font-family: inherit;
+  font-size: 1rem;
+}
 
-/* DASHBOARD */
+.google-btn:hover {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.google-btn img {
+  width: 20px;
+  height: 20px;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.auth-divider::before, .auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.auth-divider span {
+  padding: 0 12px;
+}
+
+/* --- 3. DASHBOARD VIEW --- */
 .top-header { margin-bottom: 30px; }
 .top-header h1 { font-size: 1.8rem; margin-bottom: 5px; color: #0f172a; }
 .top-header p { color: #64748b; }
@@ -439,7 +348,7 @@ body.public .sidebar { display: none; }
 .tool-card h3 { font-size: 1.1rem; font-weight: 900; }
 .tool-card p { font-size: 0.95rem; color: #64748b; line-height: 1.5; }
 
-/* WORKSPACE */
+/* --- 4. WORKSPACE (CHAT) VIEW --- */
 .workspace-header {
   display: flex;
   justify-content: space-between;
@@ -532,7 +441,7 @@ body.public .sidebar { display: none; }
   gap: 10px;
 }
 
-/* EXPORT BUTTON */
+/* Export Button (Genelde workspace'te olduğu için buraya aldım) */
 .actions { display: flex; align-items: center; }
 .export-btn {
   display: inline-flex; align-items: center; gap: 8px;
@@ -546,60 +455,3 @@ body.public .sidebar { display: none; }
 }
 .export-btn:hover { background: #f1f5f9; }
 .export-btn i { line-height: 1; }
-
-/* Responsive */
-@media (max-width: 920px) {
-  .landing-hero { grid-template-columns: 1fr; }
-}
-
-/* --- GOOGLE LOGIN EKLEMELERİ --- */
-.google-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
-  color: #1e293b;
-  padding: 12px 14px;
-  border-radius: 12px;
-  font-weight: 900; /* Mevcut font kalınlığına uyum */
-  cursor: pointer;
-  transition: 0.2s;
-  margin-bottom: 20px;
-  font-family: inherit;
-  font-size: 1rem;
-}
-
-.google-btn:hover {
-  background-color: #f8fafc;
-  border-color: #94a3b8;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.google-btn img {
-  width: 20px;
-  height: 20px;
-}
-
-.auth-divider {
-  display: flex;
-  align-items: center;
-  text-align: center;
-  color: #94a3b8;
-  font-size: 0.8rem;
-  font-weight: 800;
-  margin-bottom: 20px;
-}
-
-.auth-divider::before, .auth-divider::after {
-  content: '';
-  flex: 1;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.auth-divider span {
-  padding: 0 12px;
-}
-
