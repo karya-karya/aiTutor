@@ -1,4 +1,4 @@
-/* === VIEWS.CSS (Sayfa Özel Tasarımları) === */
+/* === VIEWS.CSS (Page Special Designs) === */
 
 /* --- 1. LANDING VIEW --- */
 .landing-view { padding: 26px 40px; }
@@ -155,7 +155,7 @@
   .landing-hero { grid-template-columns: 1fr; }
 }
 
-/* --- 2. AUTH VIEW (Giriş Yap) --- */
+/* --- 2. AUTH VIEW --- */
 .auth-view { 
   display: flex; 
   align-items: flex-start;
@@ -274,7 +274,7 @@
   border-color: #c7d2fe;
 }
 
-/* Auth: Google ve Divider */
+/* Auth: Google and Divider */
 .google-btn {
   width: 100%;
   display: flex;
@@ -441,7 +441,7 @@
   gap: 10px;
 }
 
-/* Export Button (Genelde workspace'te olduğu için buraya aldım) */
+/* Export Button */
 .actions { display: flex; align-items: center; }
 .export-btn {
   display: inline-flex; align-items: center; gap: 8px;

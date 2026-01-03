@@ -1,8 +1,8 @@
-/* === LAYOUT.CSS (İskelet, Sidebar, Ana Yapı) === */
+/* === LAYOUT.CSS (Skeleton, Sidebar, Main Structure) === */
 
 .app-container { display: flex; height: 100%; }
 
-/* PUBLIC MODE: sidebar gizli */
+/* PUBLIC MODE: sidebar hidden */
 body.public .sidebar { display: none; }
 
 /* --- SIDEBAR --- */

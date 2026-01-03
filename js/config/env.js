@@ -1,13 +1,13 @@
 // js/config/env.js
-// ⚠️ Not: Tarayıcı tarafındaki her şey görülebilir.
-// Supabase 'anon' key public olabilir, ama OpenAI API key kesinlikle burada olmamalı.
-// OpenAI için Netlify Function kullan (önerilen).
+// Note: Everything on the browser side is visible.
+// The Supabase ‘anon’ key can be public, but the OpenAI API key should definitely not be there.
+// Use Netlify Function for OpenAI (recommended).
 
 export const SUPABASE_URL = "https://haowbfhlmhgwjgpgbtyn.supabase.co";
 export const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
-// OpenAI çağrısı (önerilen): Netlify Function proxy
+// OpenAI call (recommended): Netlify Function proxy
 export const OPENAI_PROXY_URL = "/.netlify/functions/openai";
 
-// Model adı (proxy bunu override edebilir)
+// Model name (proxy can override this)
 export const OPENAI_MODEL = "gpt-5.2";

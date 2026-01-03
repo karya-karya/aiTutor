@@ -31,7 +31,7 @@ function setAuthTab(tab) {
 }
 
 export function initRouter() {
-  // onclick’lerin çağırması için global fonksiyonlar:
+  // Global functions for onclick to call:
   window.showLanding = () => showView('landing-view');
 
   window.showAuth = (tab='login') => {
@@ -54,7 +54,7 @@ export function initRouter() {
     window.showLanding();
   };
 
-  // Form submit handler’lar (onsubmit için)
+  // Form submit handlers (for onsubmit)
   window.loginSubmit = async (e) => {
     e.preventDefault();
     const email = $('login-email')?.value?.trim();
@@ -78,10 +78,9 @@ export function initRouter() {
     const { error } = await registerUser(name, email, pass, role);
     if (error) return alert(error.message);
 
-    // kayıt oldu -> login ekranına dön
+
     window.showAuth('login');
   };
 
-  // ilk açılış
   window.showLanding();
 }

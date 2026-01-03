@@ -5,7 +5,7 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./env.js";
 let supabase = null;
 
 try {
-  // anon key kullan (service_role kullanma!)
+  // use anon key (don't use service_role!)
   if (SUPABASE_URL && SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.includes("SENIN_")) {
     supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     console.log("✅ Supabase bağlandı.");

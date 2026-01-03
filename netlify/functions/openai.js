@@ -23,7 +23,7 @@ export default async (request, context) => {
   const toolMode = body.toolMode || "chat";
   const model = process.env.OPENAI_MODEL || body.model || "gpt-5.2";
 
-  // Basit tool promptları (istersen daha sonra iyileştiririz)
+  // Simple tool prompts
   const instructionsMap = {
     chat: "You are a friendly English conversation partner. Keep replies concise and encouraging.",
     interview: "You are an interviewer. Ask one question at a time and give short feedback.",
@@ -55,7 +55,7 @@ export default async (request, context) => {
     });
   }
 
-  // Responses API: output_text alanı genelde hazır olur
+  // Responses API: output_text field is usually ready
   const text = data.output_text || (data.output?.[0]?.content?.[0]?.text ?? "");
   return new Response(JSON.stringify({ text }), {
     status: 200,

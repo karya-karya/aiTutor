@@ -1,9 +1,9 @@
 // js/services/openaiService.js
 import { OPENAI_PROXY_URL, OPENAI_MODEL } from "../config/env.js";
 
-// Önerilen kullanım: OPENAI_PROXY_URL (Netlify Function) üzerinden çağır.
-// Çünkü OpenAI API key tarayıcıya koymak güvenli değil.
-// (OpenAI docs: API key secret, client-side'a koyma.)
+// Suggested usage: Call via OPENAI_PROXY_URL (Netlify Function).
+// Because it is not safe to put the OpenAI API key in the browser.
+// (OpenAI docs: API key secret, don't put it on client-side.)
 export async function callOpenAI({ toolMode, userText }) {
   const payload = {
     toolMode,
@@ -11,7 +11,7 @@ export async function callOpenAI({ toolMode, userText }) {
     model: OPENAI_MODEL
   };
 
-  // Proxy varsa onu kullan
+  // If you have a proxy, use it
   if (OPENAI_PROXY_URL) {
     const res = await fetch(OPENAI_PROXY_URL, {
       method: "POST",

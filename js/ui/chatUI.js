@@ -78,12 +78,12 @@ export function initChatUI() {
     toolTitle: document.getElementById("tool-title"),
   };
 
-  // Enter ile gönder
+  
   els.userInput?.addEventListener("keydown", (e) => {
     if (e.key === "Enter") sendMessage();
   });
 
-  // Inline onclick'ler için global
+  
   window.sendMessage = sendMessage;
   window.exportChat = exportChat;
 }

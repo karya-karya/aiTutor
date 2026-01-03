@@ -1,7 +1,6 @@
-/* === BASE.CSS (Temel Ayarlar, Renkler, Butonlar) === */
+/* === BASE.CSS (Basic Settings, Colors, Buttons) === */
 
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap');
-/* Not: Font importunu buraya ekledim ki her yerde çalışsın */
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Outfit", sans-serif; }
 
@@ -14,7 +13,7 @@ input, button, select, textarea { font-family: inherit; }
 
 .muted { color: #64748b; }
 
-/* --- COMMON BUTTONS (Ortak Butonlar) --- */
+/* --- COMMON BUTTONS --- */
 .primary-btn {
   border: none;
   border-radius: 12px;
@@ -74,7 +73,7 @@ input, button, select, textarea { font-family: inherit; }
 
 .link-btn:hover { text-decoration: underline; }
 
-/* --- ICON BOX (Küçük ikon kutuları) --- */
+/* --- ICON BOX --- */
 .icon-box { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
 .blue { background: #eff6ff; color: #3b82f6; }
 .purple { background: #f5f3ff; color: #8b5cf6; }
