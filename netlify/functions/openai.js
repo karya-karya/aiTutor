@@ -1,64 +1,96 @@
 // netlify/functions/openai.js
-// Netlify Functions (Node 18+) - OpenAI proxy
-// Environment variables (Netlify UI -> Site settings -> Environment variables):
-// - OPENAI_API_KEY=...
-// Optional:
-// - OPENAI_MODEL=gpt-5.2
-
 export default async (request, context) => {
+  // CORS headers for browser requests
+  const headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS"
+  };
+
+  // Handle preflight requests
+  if (request.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers });
+  }
+
   if (request.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405 });
+    return new Response(JSON.stringify({ error: "Method Not Allowed" }), { 
+      status: 405, 
+      headers 
+    });
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return new Response(JSON.stringify({ error: "OPENAI_API_KEY missing on server" }), {
       status: 500,
-      headers: { "Content-Type": "application/json" }
+      headers
     });
   }
 
-  const body = await request.json().catch(() => ({}));
-  const userText = body.userText || "";
-  const toolMode = body.toolMode || "chat";
-  const model = process.env.OPENAI_MODEL || body.model || "gpt-5.2";
+  try {
+    const body = await request.json();
+    const userText = body.userText || "";
+    const toolMode = body.toolMode || "chat";
+    const model = process.env.OPENAI_MODEL || body.model || "gpt-4o-mini";
 
-  // Simple tool prompts
-  const instructionsMap = {
-    chat: "You are a friendly English conversation partner. Keep replies concise and encouraging.",
-    interview: "You are an interviewer. Ask one question at a time and give short feedback.",
-    grammar: "You are a grammar fixer. Correct the user's text and explain briefly.",
-    tutor: "You are a language tutor. Explain clearly with examples."
-  };
+    // Tool-specific system prompts
+    const systemPrompts = {
+      chat: "You are a friendly English conversation partner. Keep replies concise and encouraging. Help improve fluency naturally.",
+      interview: "You are a professional interviewer. Ask one relevant question at a time based on the candidate's field. Give constructive feedback.",
+      grammar: "You are a grammar expert. Correct the user's text, explain mistakes clearly, and provide the corrected version.",
+      tutor: "You are an English language tutor. Explain grammar rules, vocabulary, and concepts clearly with practical examples."
+    };
 
-  const instructions = instructionsMap[toolMode] || instructionsMap.chat;
+    const systemPrompt = systemPrompts[toolMode] || systemPrompts.chat;
 
-  const res = await fetch("https://api.openai.com/v1/responses", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model,
-      instructions,
-      input: userText
-    })
-  });
+    // Call OpenAI Chat Completions API
+    const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userText }
+        ],
+        max_tokens: 500,
+        temperature: 0.7
+      })
+    });
 
-  const data = await res.json().catch(() => ({}));
+    const data = await openaiResponse.json();
 
-  if (!res.ok) {
-    return new Response(JSON.stringify({ error: data }), {
-      status: res.status,
-      headers: { "Content-Type": "application/json" }
+    if (!openaiResponse.ok) {
+      console.error("OpenAI Error:", data);
+      return new Response(JSON.stringify({ 
+        error: data.error?.message || "OpenAI API error",
+        details: data
+      }), {
+        status: openaiResponse.status,
+        headers
+      });
+    }
+
+    // Extract response text
+    const text = data.choices?.[0]?.message?.content || "Sorry, I couldn't generate a response.";
+    
+    return new Response(JSON.stringify({ text }), {
+      status: 200,
+      headers
+    });
+
+  } catch (error) {
+    console.error("Function Error:", error);
+    return new Response(JSON.stringify({ 
+      error: "Internal server error",
+      message: error.message
+    }), {
+      status: 500,
+      headers
     });
   }
-
-  // Responses API: output_text field is usually ready
-  const text = data.output_text || (data.output?.[0]?.content?.[0]?.text ?? "");
-  return new Response(JSON.stringify({ text }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" }
-  });
 };

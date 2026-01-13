@@ -1,13 +1,12 @@
 // js/config/env.js
-// Note: Everything on the browser side is visible.
-// The Supabase ‘anon’ key can be public, but the OpenAI API key should definitely not be there.
-// Use Netlify Function for OpenAI (recommended).
-
+// Supabase Configuration
+// Get your Supabase URL and anon key from: https://app.supabase.com/project/_/settings/api
 export const SUPABASE_URL = "https://haowbfhlmhgwjgpgbtyn.supabase.co";
-export const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+export const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY_HERE";
 
-// OpenAI call (recommended): Netlify Function proxy
+// OpenAI proxy endpoint (Netlify Function)
+// This keeps your OpenAI API key secure on the server
 export const OPENAI_PROXY_URL = "/.netlify/functions/openai";
 
-// Model name (proxy can override this)
-export const OPENAI_MODEL = "gpt-5.2";
+// Default OpenAI model (can be overridden in Netlify environment variables)
+export const OPENAI_MODEL = "gpt-4o-mini";

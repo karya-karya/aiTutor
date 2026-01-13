@@ -1,4 +1,6 @@
-import { loginUser, registerUser, logoutUser } from '../services/authService.js';
+// js/ui/router.js
+import { loginUser, registerUser, logoutUser, loginWithGoogle } from '../services/authService.js';
+import { initChatUI, setTool } from './chatUI.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -31,8 +33,14 @@ function setAuthTab(tab) {
 }
 
 export function initRouter() {
+  // Initialize chat UI
+  initChatUI();
+
   // Global functions for onclick to call:
-  window.showLanding = () => showView('landing-view');
+  window.showLanding = () => {
+    document.body.classList.add('public');
+    showView('landing-view');
+  };
 
   window.showAuth = (tab='login') => {
     showView('auth-view');
@@ -41,31 +49,46 @@ export function initRouter() {
 
   window.switchAuthTab = (tab) => setAuthTab(tab);
 
-  window.showDashboard = () => showView('dashboard-view');
+  window.showDashboard = () => {
+    document.body.classList.remove('public');
+    showView('dashboard-view');
+  };
 
   window.openTool = (tool) => {
     showView('workspace-view');
-    const title = $('tool-title');
-    if (title) title.textContent = tool;
+    setTool(tool);
   };
 
   window.logout = async () => {
     await logoutUser();
+    document.body.classList.add('public');
     window.showLanding();
   };
 
-  // Form submit handlers (for onsubmit)
-  window.loginSubmit = async (e) => {
+  // Auth form bindings
+  $('login-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = $('login-email')?.value?.trim();
     const pass = $('login-password')?.value;
 
-    const { error } = await loginUser(email, pass);
-    if (error) return alert(error.message);
-    window.showDashboard();
-  };
+    const errorEl = $('auth-error');
+    errorEl?.classList.add('hidden');
 
-  window.registerSubmit = async (e) => {
+    try {
+      const { error } = await loginUser(email, pass);
+      if (error) {
+        errorEl.textContent = error.message;
+        errorEl?.classList.remove('hidden');
+        return;
+      }
+      window.showDashboard();
+    } catch (err) {
+      errorEl.textContent = 'Login failed: ' + err.message;
+      errorEl?.classList.remove('hidden');
+    }
+  });
+
+  $('register-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = $('reg-name')?.value?.trim();
     const email = $('reg-email')?.value?.trim();
@@ -73,14 +96,57 @@ export function initRouter() {
     const confirm = $('reg-confirm')?.value;
     const role = document.querySelector('input[name="role"]:checked')?.value || 'student';
 
-    if (pass !== confirm) return alert('Passwords do not match.');
+    const errorEl = $('auth-error');
+    errorEl?.classList.add('hidden');
 
-    const { error } = await registerUser(name, email, pass, role);
-    if (error) return alert(error.message);
+    if (pass !== confirm) {
+      errorEl.textContent = 'Passwords do not match.';
+      errorEl?.classList.remove('hidden');
+      return;
+    }
 
+    try {
+      const { error } = await registerUser({ name, email, password: pass, role });
+      if (error) {
+        errorEl.textContent = error.message;
+        errorEl?.classList.remove('hidden');
+        return;
+      }
+      
+      alert('Registration successful! Please check your email to verify your account, then login.');
+      window.showAuth('login');
+    } catch (err) {
+      errorEl.textContent = 'Registration failed: ' + err.message;
+      errorEl?.classList.remove('hidden');
+    }
+  });
 
-    window.showAuth('login');
-  };
+  // Google login button
+  $('btn-google-login')?.addEventListener('click', async () => {
+    try {
+      const { error } = await loginWithGoogle();
+      if (error) {
+        alert('Google login failed: ' + error.message);
+      }
+    } catch (err) {
+      alert('Google login error: ' + err.message);
+    }
+  });
 
+  // Landing page buttons
+  $('btn-go-login')?.addEventListener('click', () => window.showAuth('login'));
+  $('btn-go-register')?.addEventListener('click', () => window.showAuth('register'));
+  $('btn-hero-start')?.addEventListener('click', () => window.showAuth('register'));
+  $('btn-hero-login')?.addEventListener('click', () => window.showAuth('login'));
+  
+  // Back to home buttons
+  $('btn-back-home')?.addEventListener('click', () => window.showLanding());
+  $('btn-back-home-2')?.addEventListener('click', () => window.showLanding());
+
+  // Auth tab switching
+  $('tab-login')?.addEventListener('click', () => setAuthTab('login'));
+  $('tab-register')?.addEventListener('click', () => setAuthTab('register'));
+
+  // Start on landing page
   window.showLanding();
 }
