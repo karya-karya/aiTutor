@@ -69,3 +69,8 @@ body.public .sidebar { display: none; }
 .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
 
 .view-section { padding: 40px; height: 100%; overflow-y: auto; }
+
+/* YENİ EKLENEN KISIM */
+
+/* Admin panelde sidebar kapat */
+body.no-sidebar .sidebar { display: none; }

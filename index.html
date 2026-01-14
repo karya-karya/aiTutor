@@ -66,6 +66,10 @@
             <button class="primary-btn small" id="btn-go-register">
               <i class="fa-solid fa-user-plus"></i> Get Started
             </button>
+            <button class="outline-btn" onclick="previewUI('student')">Preview Student</button>
+            <button class="outline-btn" onclick="previewUI('teacher')">Preview Teacher</button>
+            <button class="outline-btn" onclick="previewUI('admin')">Preview Admin</button>
+
           </div>
         </header>
 
@@ -280,58 +284,100 @@
         </div>
       </section>
 
-      <!-- DASHBOARD VIEW -->
-      <section id="dashboard-view" class="view-section hidden">
-        <header class="top-header">
-          <h1>What do you want to practice today?</h1>
-          <p>Select an AI tool to start learning.</p>
-        </header>
+     
+<!--  ADMIN VIEW (sidebar yok) --> 
+<section id="admin-view" class="view-section hidden">
+  <div class="top-header">
+    <h1>Admin Panel</h1>
+    <p>Users / Classes / Analytics</p>
+  </div>
 
-        <div class="tools-grid">
-          <div class="tool-card" onclick="openTool('chat')">
-            <div class="icon-box blue"><i class="fa-regular fa-comments"></i></div>
-            <h3>Free Conversation</h3>
-            <p>Chat freely with AI to improve fluency and daily speaking skills.</p>
-          </div>
+  <div class="admin-card">
+    <div class="admin-toolbar">
+      <input class="admin-search" placeholder="Search users..." />
+      <button class="ghost-btn" onclick="logout()">Logout</button>
+    </div>
 
-          <div class="tool-card" onclick="openTool('interview')">
-            <div class="icon-box purple"><i class="fa-solid fa-user-tie"></i></div>
-            <h3>Mock Interview</h3>
-            <p>Prepare for job interviews with field-specific questions.</p>
-          </div>
+    <div class="admin-tabs">
+      <button class="admin-tab active">Users</button>
+      <button class="admin-tab">Students</button>
+      <button class="admin-tab">Teachers</button>
+    </div>
 
-          <div class="tool-card" onclick="openTool('grammar')">
-            <div class="icon-box orange"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-            <h3>Grammar Fixer</h3>
-            <p>Paste your text or write, and let AI find and explain your mistakes.</p>
-          </div>
+    <div class="admin-table">
+      <div class="admin-row admin-head">
+        <div>Name</div><div>Email</div><div>Role</div><div>Classes</div><div>Status</div><div>Actions</div>
+      </div>
 
-          <div class="tool-card" onclick="openTool('tutor')">
-            <div class="icon-box green"><i class="fa-solid fa-chalkboard-user"></i></div>
-            <h3>Topic Explainer</h3>
-            <p>Ask about any grammar rule or topic and get a simple explanation.</p>
-          </div>
+      <div class="admin-row">
+        <div>John Smith</div><div>john@example.com</div><div>Student</div><div>English 301</div>
+        <div><span class="pill ok">Active</span></div>
+        <div><button class="link-btn">Edit</button></div>
+      </div>
+
+      <div class="admin-row">
+        <div>Sarah Johnson</div><div>sarah@example.com</div><div>Teacher</div><div>Math Basics</div>
+        <div><span class="pill warn">Suspended</span></div>
+        <div><button class="link-btn">Edit</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+      
+  </div>
+  <!--  WORKSPACE VIEW (Teacher/Student UI) -->
+    
+<section id="workspace-view" class="view-section hidden workspace-v2">
+  <div class="ws-grid">
+
+    <!-- LEFT -->
+    <aside class="ws-left">
+      <div class="ws-left-title">Tools</div>
+
+      <div class="ws-left-menu">
+        <button class="ws-nav" onclick="openTool('chat')">New Chat</button>
+        <button class="ws-nav" onclick="openTool('group')">Group Chat</button>
+        <button class="ws-nav" onclick="openTool('level')">Level Test</button>
+        <button class="ws-nav" onclick="openTool('interview')">Interview</button>
+        <button class="ws-nav" onclick="openTool('grammar')">Grammar Fixer</button>
+        <button class="ws-nav" onclick="openTool('tutor')">Topic Explainer</button>
+      </div>
+
+      <div class="ws-left-block">
+        <div class="ws-left-title">Rooms</div>
+        <div class="ws-mini-list">
+          <div class="ws-mini-item">Room 1</div>
+          <div class="ws-mini-item">Room 2</div>
         </div>
-      </section>
+      </div>
 
-      <!-- WORKSPACE VIEW -->
-      <section id="workspace-view" class="view-section hidden">
-        <header class="workspace-header">
-          <button class="back-btn" onclick="showDashboard()">
-            <i class="fa-solid fa-arrow-left"></i> Back to Tools
-          </button>
+      <div class="ws-left-bottom">
+        <button class="ws-nav ghost" onclick="showDashboard()">Back</button>
+        <button class="ws-nav ghost" onclick="logout()">Logout</button>
+      </div>
+    </aside>
 
-          <h2 id="tool-title">Tool Name</h2>
+    <!-- CENTER -->
+    <main class="ws-center">
+      <header class="ws-topbar">
+        <div class="ws-tabs">
+          <button class="ws-tab">Files</button>
+          <button class="ws-tab">Gönderilen</button>
+          <button class="ws-tab">Schedule</button>
+          <button class="ws-tab" onclick="exportChat()">Export</button>
+        </div>
 
-          <div class="actions">
-            <button type="button" class="export-btn" onclick="exportChat()">
-              <i class="fa-solid fa-download"></i>
-              <span>Export</span>
-            </button>
-          </div>
-        </header>
+        <div class="ws-tool-title" id="tool-title">Tool Name</div>
+      </header>
 
-        <div class="chat-interface">
+      <section class="ws-chatwrap">
+        <div class="ws-chat-history">
+          <div class="ws-history-title">Chat History</div>
+          <div class="ws-history-note">gelecek / arama / yeniden ad</div>
+        </div>
+
+        <div class="chat-interface v2">
           <div id="chat-window" class="chat-window"></div>
 
           <div id="correction-box" class="correction-box hidden">
@@ -339,12 +385,16 @@
             <span id="correction-text"></span>
           </div>
 
-          <div class="input-area">
+          <div class="input-area v2">
             <button class="voice-btn" type="button" onclick="alert('Voice is demo-only for now.')">
               <i class="fa-solid fa-microphone"></i>
             </button>
 
-            <input type="text" id="user-input" placeholder="Type your message here..." />
+            <button class="attach-btn" type="button" onclick="alert('Attach is demo-only for now.')">
+              <i class="fa-solid fa-paperclip"></i>
+            </button>
+
+            <input type="text" id="user-input" placeholder="Type..." />
 
             <button class="send-btn" type="button" onclick="sendMessage()">
               <i class="fa-solid fa-paper-plane"></i>
@@ -352,9 +402,19 @@
           </div>
         </div>
       </section>
-
     </main>
+
+    <!-- RIGHT -->
+    <aside class="ws-right" id="ws-right-panel">
+      <div class="ws-right-card">
+        <div class="ws-right-title">Teacher Area</div>
+        <div class="ws-right-desc">Arayüz / group chat kısmı</div>
+      </div>
+    </aside>
+
   </div>
+</section>  
+
 
   <!-- App entry -->
   <script type="module" src="./js/app.js"></script>

@@ -455,3 +455,183 @@
 }
 .export-btn:hover { background: #f1f5f9; }
 .export-btn i { line-height: 1; }
+
+/* YENİ EKLENENE KISIMLAR */
+
+/* ==============================
+   WORKSPACE V2 (Teacher/Student)
+================================= */
+.workspace-v2 { padding: 18px; height: 100%; }
+
+.ws-grid{
+  height: calc(100vh - 60px);
+  display: grid;
+  grid-template-columns: 260px 1fr 280px;
+  gap: 16px;
+}
+
+.ws-left, .ws-center, .ws-right{
+  background:#fff;
+  border:1px solid #e2e8f0;
+  border-radius:16px;
+  overflow:hidden;
+}
+
+.ws-left{ padding: 14px; display:flex; flex-direction:column; }
+.ws-left-title{ font-weight: 1000; color:#0f172a; margin-bottom:10px; }
+.ws-left-menu{ display:flex; flex-direction:column; gap:10px; }
+
+.ws-nav{
+  border:1px solid #e2e8f0;
+  background:#f8fafc;
+  padding:10px 12px;
+  border-radius:12px;
+  font-weight:900;
+  cursor:pointer;
+  text-align:left;
+}
+.ws-nav:hover{ background:#f1f5f9; }
+.ws-nav.ghost{ background:transparent; }
+.ws-nav.ghost:hover{ background:#eef2ff; border-color:#c7d2fe; }
+
+.ws-left-block{ margin-top:14px; }
+.ws-mini-list{ display:flex; flex-direction:column; gap:8px; }
+.ws-mini-item{
+  padding:10px 12px;
+  border:1px solid #e2e8f0;
+  border-radius:12px;
+  background:#fff;
+  color:#64748b;
+  font-weight:800;
+}
+.ws-left-bottom{ margin-top:auto; display:grid; gap:10px; }
+
+.ws-center{ display:grid; grid-template-rows:auto 1fr; }
+.ws-topbar{
+  padding: 12px 12px;
+  border-bottom:1px solid #e2e8f0;
+  display:flex; align-items:center; justify-content:space-between;
+}
+
+.ws-tabs{ display:flex; gap:8px; flex-wrap: wrap; }
+.ws-tab{
+  border:1px solid #e2e8f0;
+  background:#fff;
+  padding:8px 10px;
+  border-radius:12px;
+  font-weight:900;
+  cursor:pointer;
+}
+.ws-tab:hover{ background:#f8fafc; }
+
+.ws-tool-title{
+  font-weight:1000;
+  background:#eef2ff;
+  border:1px solid #c7d2fe;
+  color:#3730a3;
+  padding:8px 12px;
+  border-radius:12px;
+}
+
+.ws-chatwrap{
+  padding: 12px;
+  display:grid;
+  grid-template-rows: auto 1fr;
+  gap: 12px;
+  overflow:hidden;
+}
+
+.ws-chat-history{
+  border:1px dashed #e2e8f0;
+  border-radius:14px;
+  padding:12px;
+  background:#fafafa;
+}
+.ws-history-title{ font-weight:1000; }
+.ws-history-note{ color:#64748b; font-weight:800; margin-top:6px; }
+
+/* Chat interface mevcut stilini bozma ama biraz uyumla */
+.chat-interface.v2{ height: 100%; }
+.input-area.v2{
+  display:grid;
+  grid-template-columns: 40px 40px 1fr 40px;
+  gap: 10px;
+  align-items: center;
+}
+.attach-btn{
+  width:40px; height:40px;
+  border-radius:8px;
+  border:none;
+  cursor:pointer;
+  background:#f1f5f9;
+  color:#64748b;
+}
+.attach-btn:hover{ background:#e2e8f0; color:#0f172a; }
+
+/* Right panel */
+.ws-right{ padding:14px; }
+.ws-right-card{
+  border:1px solid #e2e8f0;
+  border-radius:16px;
+  padding:14px;
+  background:#f8fafc;
+}
+.ws-right-title{ font-weight:1000; }
+.ws-right-desc{ margin-top:6px; color:#64748b; font-weight:800; }
+
+/* Responsive */
+@media (max-width: 1100px){
+  .ws-grid{ grid-template-columns: 240px 1fr; }
+  .ws-right{ display:none; }
+}
+@media (max-width: 860px){
+  .ws-grid{ grid-template-columns: 1fr; }
+  .ws-left{ display:none; }
+}
+
+
+/* ==============================
+   ADMIN VIEW (sidebar yok)
+================================= */
+.admin-card{
+  background:#fff;
+  border:1px solid #e2e8f0;
+  border-radius:16px;
+  padding:16px;
+}
+.admin-toolbar{
+  display:flex; gap:12px; align-items:center; justify-content:space-between;
+  margin-bottom:12px;
+}
+.admin-search{
+  flex:1;
+  padding:12px 14px;
+  border:1px solid #cbd5e1;
+  border-radius:12px;
+  outline:none;
+}
+.admin-tabs{ display:flex; gap:10px; margin-bottom:12px; flex-wrap: wrap; }
+.admin-tab{
+  border:1px solid #e2e8f0;
+  background:#fff;
+  border-radius:12px;
+  padding:10px 12px;
+  font-weight:1000;
+  cursor:pointer;
+}
+.admin-tab.active{ background:#eef2ff; border-color:#c7d2fe; color:#3730a3; }
+
+.admin-table{ border:1px solid #e2e8f0; border-radius:14px; overflow:hidden; background:#fff; }
+.admin-row{
+  display:grid;
+  grid-template-columns: 1.2fr 1.4fr 0.8fr 1fr 0.8fr 0.6fr;
+  gap:10px;
+  padding:12px;
+  border-top:1px solid #e2e8f0;
+  align-items:center;
+}
+.admin-head{ font-weight:1000; background:#f8fafc; border-top:none; }
+
+.pill{ padding:6px 10px; border-radius:999px; font-weight:1000; font-size:12px; display:inline-block; text-align:center; }
+.pill.ok{ background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; }
+.pill.warn{ background:#fff7ed; color:#9a3412; border:1px solid #fed7aa; }
