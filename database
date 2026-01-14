@@ -1,13 +1,27 @@
-
+-- 1. Kullanıcı Profilleri Tablosu (auth.users ile senkronize çalışır)
 create table public.profiles (
   id uuid references auth.users not null primary key,
   email text,
   full_name text,
-  role text default 'student', -- student, teacher, admin
-  level text, 
-  department text, 
-  xp integer default 0, -- Oyunlaştırma için puan
-  badges text, -- Rozetler
+  role text default 'student' check (role in ('student', 'teacher', 'admin')),
+  avatar_url text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- 2. Sohbet Oturumları Tablosu (ChatSession)
+create table public.chat_sessions (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references public.profiles(id) on delete cascade not null,
+  title text default 'New Chat',
+  mode text default 'text', -- 'text' veya 'voice'
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 3. Sohbet Mesajları Tablosu (ChatMessage)
+create table public.chat_messages (
+  id uuid default gen_random_uuid() primary key,
+  session_id uuid references public.chat_sessions(id) on delete cascade not null,
+  sender_type text check (sender_type in ('user', 'ai')),
+  content text not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
